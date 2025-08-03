@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Advanced QR Code Generator</title>
+    <link href="https://fonts.googleapis.com/css?family=Inter:400,600,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            padding: 40px;
+        }
+
+        .input-section {
+            background: #f8fafc;
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .input-section h2 {
+            color: #1e293b;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #374151;
+            font-size: 1rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* QR Type Cards */
+        .qr-type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .qr-type-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .qr-type-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .qr-type-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .qr-type-card .icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .qr-type-card .name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Color Picker Section */
+        .color-section {
+            margin-bottom: 25px;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .color-option {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .color-option.selected::after {
+            content: '✓';
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Custom Color Picker */
+        .custom-color-picker {
+            display: none;
+            margin-top: 15px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .custom-color-picker.show {
+            display: block;
+        }
+
+        .color-picker-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .color-picker-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .color-picker-row label {
+            min-width: 80px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .color-picker-row input[type="color"] {
+            width: 60px;
+            height: 40px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .color-picker-row input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: monospace;
+        }
+
+        /* Image Upload Section */
+        .image-upload-section {
+            margin-bottom: 25px;
+        }
+
+        .image-upload-area {
+            border: 2px dashed #e2e8f0;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .image-upload-area:hover {
+            border-color: #667eea;
+            background: #f8fafc;
+        }
+
+        .image-upload-area.dragover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .image-upload-icon {
+            font-size: 3rem;
+            color: #9ca3af;
+            margin-bottom: 15px;
+        }
+
+        .image-upload-text {
+            color: #6b7280;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .image-upload-hint {
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+
+        .uploaded-image {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .remove-image {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        /* Size Slider */
+        .size-slider {
+            margin: 20px 0;
+        }
+
+        .size-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .size-value {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #e2e8f0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Error Correction Cards */
+        .error-correction-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .error-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .error-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .error-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .error-card .level {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .error-card .percentage {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 140px;
+            justify-content: center;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+        }
+
+        .btn-success {
+            background: #10b981;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Preview Section */
+        .preview-section {
+            background: #f8fafc;
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .preview-section h2 {
+            color: #1e293b;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .qr-preview {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            min-height: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #e2e8f0;
+            transition: all 0.3s;
+        }
+
+        .qr-preview img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .qr-preview.placeholder {
+            color: #9ca3af;
+            font-style: italic;
+            font-size: 1.1rem;
+        }
+
+        .info-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: left;
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        .loading {
+            display: none;
+            color: #667eea;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin: 20px 0;
+        }
+
+        .error {
+            color: #ef4444;
+            background: #fef2f2;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+            display: none;
+            border-left: 4px solid #ef4444;
+        }
+
+        .success {
+            color: #10b981;
+            background: #f0fdf4;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+            display: none;
+            border-left: 4px solid #10b981;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            .header h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .qr-type-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Advanced QR Code Generator</h1>
+            <p>Create beautiful, customizable QR codes for any purpose</p>
+        </div>
+
+        <div class="main-content">
+            <div class="input-section">
+                <h2>📝 QR Code Settings</h2>
+                
+                <!-- QR Type Selection -->
+                <div class="form-group">
+                    <label>QR Code Type:</label>
+                    <div class="qr-type-grid">
+                        <div class="qr-type-card" data-type="URL">
+                            <span class="icon">🌐</span>
+                            <div class="name">URL</div>
+                        </div>
+                        <div class="qr-type-card" data-type="Text">
+                            <span class="icon">📝</span>
+                            <div class="name">Text</div>
+                        </div>
+                        <div class="qr-type-card" data-type="Email">
+                            <span class="icon">📧</span>
+                            <div class="name">Email</div>
+                        </div>
+                        <div class="qr-type-card" data-type="Phone">
+                            <span class="icon">📞</span>
+                            <div class="name">Phone</div>
+                        </div>
+                        <div class="qr-type-card" data-type="SMS">
+                            <span class="icon">💬</span>
+                            <div class="name">SMS</div>
+                        </div>
+                        <div class="qr-type-card" data-type="WiFi">
+                            <span class="icon">📶</span>
+                            <div class="name">WiFi</div>
+                        </div>
+                        <div class="qr-type-card" data-type="Contact">
+                            <span class="icon">👤</span>
+                            <div class="name">Contact</div>
+                        </div>
+                        <div class="qr-type-card" data-type="Location">
+                            <span class="icon">📍</span>
+                            <div class="name">Location</div>
+                        </div>
+                        <div class="qr-type-card" data-type="Event">
+                            <span class="icon">📅</span>
+                            <div class="name">Event</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Input -->
+                <div class="form-group">
+                    <label for="content">Content:</label>
+                    <textarea id="content" placeholder="Enter your content here...">https://www.example.com</textarea>
+                </div>
+
+                <!-- Size Slider -->
+                <div class="form-group">
+                    <label>Size:</label>
+                    <div class="size-slider">
+                        <div class="size-display">
+                            <span>Small</span>
+                            <span class="size-value" id="sizeValue">10</span>
+                            <span>Large</span>
+                        </div>
+                        <input type="range" id="size" min="1" max="20" value="10">
+                    </div>
+                </div>
+
+                <!-- Error Correction -->
+                <div class="form-group">
+                    <label>Error Correction:</label>
+                    <div class="error-correction-grid">
+                        <div class="error-card" data-error="L">
+                            <div class="level">L</div>
+                            <div class="percentage">Low (7%)</div>
+                        </div>
+                        <div class="error-card selected" data-error="M">
+                            <div class="level">M</div>
+                            <div class="percentage">Medium (15%)</div>
+                        </div>
+                        <div class="error-card" data-error="Q">
+                            <div class="level">Q</div>
+                            <div class="percentage">Quartile (25%)</div>
+                        </div>
+                        <div class="error-card" data-error="H">
+                            <div class="level">H</div>
+                            <div class="percentage">High (30%)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Color Selection -->
+                <div class="form-group">
+                    <label>Color Scheme:</label>
+                    <div class="color-grid">
+                        <div class="color-option selected" style="background: #000000;" data-color="Classic"></div>
+                        <div class="color-option" style="background: #1e3a8a;" data-color="Blue"></div>
+                        <div class="color-option" style="background: #059669;" data-color="Green"></div>
+                        <div class="color-option" style="background: #7c3aed;" data-color="Purple"></div>
+                        <div class="color-option" style="background: #dc2626;" data-color="Red"></div>
+                        <div class="color-option" style="background: linear-gradient(45deg, #ff6b6b, #4ecdc4);" data-color="Custom"></div>
+                    </div>
+                    
+                    <!-- Custom Color Picker -->
+                    <div class="custom-color-picker" id="customColorPicker">
+                        <div class="color-picker-row">
+                            <label>QR Color:</label>
+                            <input type="color" id="qrColorPicker" value="#000000">
+                            <input type="text" id="qrColorText" value="#000000" placeholder="#000000">
+                        </div>
+                        <div class="color-picker-row">
+                            <label>Background:</label>
+                            <input type="color" id="bgColorPicker" value="#FFFFFF">
+                            <input type="text" id="bgColorText" value="#FFFFFF" placeholder="#FFFFFF">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logo Integration -->
+                <div class="form-group">
+                    <label>Logo Integration (Optional):</label>
+                    <div class="image-upload-area" id="imageUploadArea">
+                        <div class="image-upload-icon">🏢</div>
+                        <div class="image-upload-text">Click to upload or drag logo here</div>
+                        <div class="image-upload-hint">Logo will be integrated into the center of QR code (Max 5MB)</div>
+                        <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                    </div>
+                    <div id="uploadedImageContainer" style="display: none;">
+                        <img id="uploadedImage" class="uploaded-image">
+                        <button class="remove-image" onclick="removeImage()">Remove Logo</button>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="btn-group">
+                    <button class="btn" onclick="generateQR()">
+                        🔄 Generate QR Code
+                    </button>
+                    <button class="btn btn-success" onclick="downloadQR()">
+                        💾 Download
+                    </button>
+                    <button class="btn btn-secondary" onclick="copyQR()">
+                        📋 Copy
+                    </button>
+                </div>
+
+                <div class="loading" id="loading">Generating QR code...</div>
+                <div class="error" id="error"></div>
+                <div class="success" id="success"></div>
+            </div>
+
+            <div class="preview-section">
+                <h2>👁️ Preview</h2>
+                <div class="qr-preview placeholder fade-in" id="qrPreview">
+                    Your QR code will appear here
+                </div>
+                <div class="info-section" id="qrInfo">
+                    Enter content and click "Generate QR Code" to see the preview
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // QR Code types with default content
+        const qrTypes = {
+            "URL": "https://www.example.com",
+            "Text": "Enter your text here",
+            "Email": "example@email.com",
+            "Phone": "+1234567890",
+            "SMS": "sms:+1234567890:Hello World",
+            "WiFi": "WIFI:S:NetworkName;T:WPA;P:Password;;",
+            "Contact": "BEGIN:VCARD\nVERSION:3.0\nFN:John Doe\nTEL:+1234567890\nEMAIL:john@example.com\nEND:VCARD",
+            "Location": "geo:40.7128,-74.0060",
+            "Event": "BEGIN:VEVENT\nSUMMARY:Meeting\nDTSTART:20240101T100000Z\nDTEND:20240101T110000Z\nEND:VEVENT"
+        };
+
+        // Color schemes with proper color mapping
+        const colorSchemes = {
+            "Classic": { foreground: "#000000", background: "#FFFFFF" },
+            "Blue": { foreground: "#1e3a8a", background: "#ffffff" },
+            "Green": { foreground: "#059669", background: "#ffffff" },
+            "Purple": { foreground: "#7c3aed", background: "#ffffff" },
+            "Red": { foreground: "#dc2626", background: "#ffffff" },
+            "Custom": { foreground: "#000000", background: "#FFFFFF" }
+        };
+
+        let currentQRData = null;
+        let selectedType = 'URL';
+        let selectedErrorCorrection = 'M';
+        let selectedColorScheme = 'Classic';
+        let customForegroundColor = '#000000';
+        let customBackgroundColor = '#FFFFFF';
+        let uploadedImage = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSizeValue();
+            updateDefaultContent();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // QR Type selection
+            document.querySelectorAll('.qr-type-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    document.querySelectorAll('.qr-type-card').forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedType = this.dataset.type;
+                    updateDefaultContent();
+                });
+            });
+
+            // Error correction selection
+            document.querySelectorAll('.error-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    document.querySelectorAll('.error-card').forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedErrorCorrection = this.dataset.error;
+                    updatePreview();
+                });
+            });
+
+            // Color selection
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedColorScheme = this.dataset.color;
+                    
+                    if (selectedColorScheme === 'Custom') {
+                        document.getElementById('customColorPicker').classList.add('show');
+                    } else {
+                        document.getElementById('customColorPicker').classList.remove('show');
+                    }
+                    
+                    updatePreview();
+                });
+            });
+
+            // Custom color picker events
+            document.getElementById('qrColorPicker').addEventListener('input', function() {
+                customForegroundColor = this.value;
+                document.getElementById('qrColorText').value = this.value;
+                updatePreview();
+            });
+
+            document.getElementById('bgColorPicker').addEventListener('input', function() {
+                customBackgroundColor = this.value;
+                document.getElementById('bgColorText').value = this.value;
+                updatePreview();
+            });
+
+            document.getElementById('qrColorText').addEventListener('input', function() {
+                customForegroundColor = this.value;
+                document.getElementById('qrColorPicker').value = this.value;
+                updatePreview();
+            });
+
+            document.getElementById('bgColorText').addEventListener('input', function() {
+                customBackgroundColor = this.value;
+                document.getElementById('bgColorPicker').value = this.value;
+                updatePreview();
+            });
+
+            // Size slider
+            document.getElementById('size').addEventListener('input', function() {
+                updateSizeValue();
+                updatePreview();
+            });
+
+            // Content input
+            document.getElementById('content').addEventListener('input', updatePreview);
+
+            // Image upload
+            setupImageUpload();
+        }
+
+        function setupImageUpload() {
+            const uploadArea = document.getElementById('imageUploadArea');
+            const imageInput = document.getElementById('imageInput');
+
+            // Click to upload
+            uploadArea.addEventListener('click', () => imageInput.click());
+
+            // Drag and drop
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleImageUpload(files[0]);
+                }
+            });
+
+            // File input change
+            imageInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleImageUpload(e.target.files[0]);
+                }
+            });
+        }
+
+        function handleImageUpload(file) {
+            if (!file.type.startsWith('image/')) {
+                showError('Please select a valid image file');
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                showError('Image size must be less than 5MB');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                uploadedImage = e.target.result;
+                document.getElementById('uploadedImage').src = uploadedImage;
+                document.getElementById('uploadedImageContainer').style.display = 'block';
+                document.getElementById('imageUploadArea').style.display = 'none';
+                updatePreview();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeImage() {
+            uploadedImage = null;
+            document.getElementById('uploadedImageContainer').style.display = 'none';
+            document.getElementById('imageUploadArea').style.display = 'block';
+            document.getElementById('imageInput').value = '';
+            updatePreview();
+        }
+
+        function updateSizeValue() {
+            document.getElementById('sizeValue').textContent = document.getElementById('size').value;
+        }
+
+        function updateDefaultContent() {
+            const content = document.getElementById('content');
+            content.value = qrTypes[selectedType] || '';
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const content = document.getElementById('content').value.trim();
+            if (content) {
+                generateQR();
+            }
+        }
+
+        function getCurrentColors() {
+            if (selectedColorScheme === 'Custom') {
+                return {
+                    foreground: customForegroundColor,
+                    background: customBackgroundColor
+                };
+            } else {
+                return colorSchemes[selectedColorScheme];
+            }
+        }
+
+        async function generateQR() {
+            const content = document.getElementById('content').value.trim();
+            if (!content) {
+                showError('Please enter content for the QR code');
+                return;
+            }
+
+            showLoading(true);
+            hideMessages();
+
+            const colors = getCurrentColors();
+
+            try {
+                const formData = new FormData();
+                formData.append('content', content);
+                formData.append('type', selectedType);
+                formData.append('size', document.getElementById('size').value);
+                formData.append('errorCorrection', selectedErrorCorrection);
+                formData.append('colorScheme', selectedColorScheme);
+                formData.append('foregroundColor', colors.foreground);
+                formData.append('backgroundColor', colors.background);
+                
+                if (uploadedImage) {
+                    formData.append('backgroundImage', uploadedImage);
+                }
+
+                const response = await fetch('/generate-qr', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    currentQRData = data;
+                    displayQRCode(data.imageUrl);
+                    updateQRInfo(data);
+                    showSuccess('QR code generated successfully!');
+                } else {
+                    showError(data.error || 'Failed to generate QR code');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Failed to generate QR code. Please try again.');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function displayQRCode(imageUrl) {
+            const preview = document.getElementById('qrPreview');
+            preview.className = 'qr-preview fade-in';
+            preview.innerHTML = `<img src="${imageUrl}" alt="QR Code">`;
+        }
+
+        function updateQRInfo(data) {
+            const info = document.getElementById('qrInfo');
+            info.innerHTML = `
+                <strong>QR Code Information:</strong><br>
+                Type: ${data.type}<br>
+                Content Length: ${data.content.length} characters<br>
+                Size: ${data.size}x<br>
+                Error Correction: ${data.errorCorrection}<br>
+                Color Scheme: ${data.colorScheme}<br>
+                ${uploadedImage ? '<br>Logo Integration: Applied' : ''}
+                <br>
+                <strong>Content Preview:</strong><br>
+                ${data.content.substring(0, 100)}${data.content.length > 100 ? '...' : ''}
+            `;
+        }
+
+        async function downloadQR() {
+            if (!currentQRData) {
+                showError('Please generate a QR code first');
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('content', currentQRData.content);
+                formData.append('size', currentQRData.size);
+                formData.append('errorCorrection', currentQRData.errorCorrection);
+                formData.append('colorScheme', currentQRData.colorScheme);
+                
+                const colors = getCurrentColors();
+                formData.append('foregroundColor', colors.foreground);
+                formData.append('backgroundColor', colors.background);
+                
+                if (uploadedImage) {
+                    formData.append('backgroundImage', uploadedImage);
+                }
+                
+                formData.append('format', 'png');
+
+                const response = await fetch('/download-qr', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `qr-code-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    showSuccess('QR code downloaded successfully!');
+                } else {
+                    const data = await response.json();
+                    showError(data.error || 'Failed to download QR code');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Failed to download QR code. Please try again.');
+            }
+        }
+
+        function copyQR() {
+            if (!currentQRData) {
+                showError('Please generate a QR code first');
+                return;
+            }
+
+            // Copy the content to clipboard
+            navigator.clipboard.writeText(currentQRData.content).then(() => {
+                showSuccess('Content copied to clipboard!');
+            }).catch(() => {
+                showError('Failed to copy to clipboard');
+            });
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        function showError(message) {
+            const error = document.getElementById('error');
+            error.textContent = message;
+            error.style.display = 'block';
+        }
+
+        function showSuccess(message) {
+            const success = document.getElementById('success');
+            success.textContent = message;
+            success.style.display = 'block';
+        }
+
+        function hideMessages() {
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('success').style.display = 'none';
+        }
+    </script>
+</body>
+</html> 
